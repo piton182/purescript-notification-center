@@ -9,9 +9,11 @@ import Halogen.Aff (awaitBody)
 import Halogen.VDom.Driver (runUI)
 import Halogen as H
 import Halogen.HTML as HH
+import Halogen.HTML.Properties as HP
 import Effect.Aff (Aff)
 import Data.Const (Const)
 import Data.Array (cons)
+import Halogen.HTML (ClassName(..))
 
 main :: Effect Unit
 main = launchAff_ do
@@ -69,7 +71,8 @@ instance rendarableSendOut :: Renderable SendOut where
 
 instance renderableRecipients :: Renderable (Array Recipient) where
   render recipients =
-    HH.div_
+    HH.div
+      [ HP.class_ $ ClassName "recipients" ]
       [ HH.span_ [ HH.text "Recipients" ]
       , HH.table_ $
           cons (HH.tr_ [ HH.th_ [ HH.text "User" ], HH.th_ [ HH.text "Status" ]]) $
@@ -78,7 +81,8 @@ instance renderableRecipients :: Renderable (Array Recipient) where
 
 instance renderableMessage :: Renderable Message where
   render (Message { id, text }) =
-    HH.div_
+    HH.div
+      [ HP.class_ $ ClassName "message" ]
       [ HH.table_
         [ HH.tr_
           [ HH.td_
