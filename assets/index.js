@@ -7393,7 +7393,6 @@ var PS = {};
   var element = Halogen_HTML_Core.element(Data_Maybe.Nothing.value);
   var li = element("li");
   var table = element("table");
-  var table_ = table([  ]);
   var td = element("td");
   var td_ = td([  ]);      
   var th = element("th");
@@ -7409,7 +7408,6 @@ var PS = {};
   exports["div_"] = div_;
   exports["li"] = li;
   exports["table"] = table;
-  exports["table_"] = table_;
   exports["td_"] = td_;
   exports["th_"] = th_;
   exports["tr_"] = tr_;
@@ -8068,24 +8066,24 @@ var PS = {};
       if (v instanceof Received) {
           return "Received";
       };
-      throw new Error("Failed pattern match at Main (line 81, column 1 - line 84, column 29): " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Main (line 85, column 1 - line 88, column 29): " + [ v.constructor.name ]);
   });
   var renderableRecipients = new Renderable(function (recipients) {
-      return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("blue") ])([ Halogen_HTML_Elements.table([ Halogen_HTML_Properties.class_("table") ])(Data_Array.cons(Halogen_HTML_Elements.tr_([ Halogen_HTML_Elements.th_([ Halogen_HTML_Core.text("User") ]), Halogen_HTML_Elements.th_([ Halogen_HTML_Core.text("Status") ]) ]))(Data_Functor.map(Data_Functor.functorArray)(function (v) {
+      return Halogen_HTML_Elements.div_([ Halogen_HTML_Elements.table([ Halogen_HTML_Properties.class_("table") ])(Data_Array.cons(Halogen_HTML_Elements.tr_([ Halogen_HTML_Elements.th_([ Halogen_HTML_Core.text("User") ]), Halogen_HTML_Elements.th_([ Halogen_HTML_Core.text("Status") ]) ]))(Data_Functor.map(Data_Functor.functorArray)(function (v) {
           return Halogen_HTML_Elements.tr_([ Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text(Data_Show.show(Data_Show.showString)(v.id)) ]), Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text(Data_Show.show(showStatus)(v.status)) ]) ]);
       })(recipients))) ]);
   });
   var renderableMessage = new Renderable(function (v) {
-      return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("red") ])([ Halogen_HTML_Elements.table_([ Halogen_HTML_Elements.tr_([ Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text("ID:") ]), Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text(Data_Show.show(Data_Show.showString)(v.id)) ]) ]), Halogen_HTML_Elements.tr_([ Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text("Text:") ]), Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text(Data_Show.show(Data_Show.showString)(v.text)) ]) ]) ]) ]);
+      return Halogen_HTML_Elements.div_([ Halogen_HTML_Elements.table([ Halogen_HTML_Properties.class_("table") ])([ Halogen_HTML_Elements.tr_([ Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text("ID") ]), Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text(Data_Show.show(Data_Show.showString)(v.id)) ]) ]), Halogen_HTML_Elements.tr_([ Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text("Text") ]), Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text(Data_Show.show(Data_Show.showString)(v.text)) ]) ]) ]) ]);
   });
-  var renderNav = Halogen_HTML_Elements.ul([ Halogen_HTML_Properties.class_("nav nav-tabs") ])([ Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("nav-item") ])([ Halogen_HTML_Elements.a([ Halogen_HTML_Properties.class_("nav-link active"), Halogen_HTML_Properties.href("#") ])([ Halogen_HTML_Core.text("Active") ]) ]), Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("nav-item") ])([ Halogen_HTML_Elements.a([ Halogen_HTML_Properties.class_("nav-link"), Halogen_HTML_Properties.href("#") ])([ Halogen_HTML_Core.text("Link") ]) ]) ]);
+  var renderNav = Halogen_HTML_Elements.ul([ Halogen_HTML_Properties.class_("nav nav-tabs flex-column") ])([ Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("nav-item") ])([ Halogen_HTML_Elements.a([ Halogen_HTML_Properties.class_("nav-link active"), Halogen_HTML_Properties.href("#") ])([ Halogen_HTML_Core.text("Active") ]) ]), Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("nav-item") ])([ Halogen_HTML_Elements.a([ Halogen_HTML_Properties.class_("nav-link"), Halogen_HTML_Properties.href("#") ])([ Halogen_HTML_Core.text("Link") ]) ]) ]);
   var render = function (dict) {
       return dict.render;
   };
   var rendarableSendOut = new Renderable(function (v) {
-      return Halogen_HTML_Elements.div_([ render(renderableMessage)(v.message), render(renderableRecipients)(v.recipients) ]);
+      return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("container-fluid") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("row") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col") ])([ render(renderableMessage)(v.message) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col") ])([ render(renderableRecipients)(v.recipients) ]) ]) ]);
   });
-  var renderHtml = Halogen_HTML_Elements.div_([ renderNav, render(rendarableSendOut)({
+  var renderHtml = Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("container-fluid") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("row") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col") ])([ renderNav ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col-10") ])([ render(rendarableSendOut)({
       message: {
           id: "dlg123",
           text: "hi!"
@@ -8093,8 +8091,11 @@ var PS = {};
       recipients: [ {
           id: "user1",
           status: None.value
+      }, {
+          id: "user2",
+          status: None.value
       } ]
-  }) ]);
+  }) ]) ]) ]);
   var mkMyComponent = Halogen_Component.mkComponent({
       initialState: Data_Function["const"](Data_Unit.unit),
       render: function (v) {

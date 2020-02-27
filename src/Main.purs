@@ -52,16 +52,20 @@ renderNav =
 --   </li>
 -- </ul>
   HH.ul
-    [ HP.class_ $ ClassName "nav nav-tabs" ]
+    [ HP.class_ $ ClassName "nav nav-tabs flex-column" ]
     [ HH.li [ HP.class_ $ ClassName "nav-item" ] [ HH.a [ HP.class_ $ ClassName "nav-link active", HP.href "#" ] [ HH.text "Active" ] ]
     , HH.li [ HP.class_ $ ClassName "nav-item" ] [ HH.a [ HP.class_ $ ClassName "nav-link", HP.href "#" ] [ HH.text "Link" ] ]
     ]
 
 renderHtml :: H.ComponentHTML Unit () Aff
 renderHtml =
-  HH.div_
-    [ renderNav
-    , render $ SendOut { message: Message { id: "dlg123", text: "hi!" }, recipients: [Recipient { id: "user1", status: None }]}
+  HH.div [ HP.class_ $ ClassName "container-fluid" ]
+    [ HH.div [ HP.class_ $ ClassName "row" ]
+      [ HH.div [ HP.class_ $ ClassName "col"]
+        [ renderNav ]
+      , HH.div [ HP.class_ $ ClassName "col-10"]
+        [ render $ SendOut { message: Message { id: "dlg123", text: "hi!" }, recipients: [ Recipient { id: "user1", status: None }, Recipient { id: "user2", status: None } ]} ]
+      ]
     ]
 
 -- renderHtml = render $ SendOut { message: Message { id: "dlg123", text: "hi!" }, recipients: [Recipient { id: "user1", status: None }]}
@@ -92,15 +96,22 @@ class Renderable a where
 
 instance rendarableSendOut :: Renderable SendOut where
   render (SendOut { message, recipients }) =
-    HH.div_
-      [ render message
-      , render recipients
+    HH.div [ HP.class_ $ ClassName "container-fluid" ]
+      [ HH.div [ HP.class_ $ ClassName "row" ]
+        [ HH.div [HP.class_ $ ClassName "col" ]
+          [ render message ]
+        , HH.div [HP.class_ $ ClassName "col" ]
+          [ render recipients ]
+        ]
       ]
+    -- HH.div_
+    --   [ render message
+    --   , render recipients
+    --   ]
 
 instance renderableRecipients :: Renderable (Array Recipient) where
   render recipients =
-    HH.div
-      [ HP.class_ $ ClassName "blue" ]
+    HH.div_
       [ HH.table [ HP.class_ $ ClassName "table" ] $
           cons (HH.tr_ [ HH.th_ [ HH.text "User" ], HH.th_ [ HH.text "Status" ]]) $
             (\(Recipient r) -> HH.tr_ [ HH.td_ [ HH.text $ show r.id ], HH.td_ [ HH.text $ show r.status ] ]) <$> recipients
@@ -108,18 +119,17 @@ instance renderableRecipients :: Renderable (Array Recipient) where
 
 instance renderableMessage :: Renderable Message where
   render (Message { id, text }) =
-    HH.div
-      [ HP.class_ $ ClassName "red" ]
-      [ HH.table_
+    HH.div_
+      [ HH.table [ HP.class_ $ ClassName "table" ]
         [ HH.tr_
           [ HH.td_
-            [ HH.text "ID:" ]
+            [ HH.text "ID" ]
           , HH.td_
             [ HH.text $ show id ]
           ]
         , HH.tr_
           [ HH.td_
-            [ HH.text "Text:" ]
+            [ HH.text "Text" ]
           , HH.td_
             [ HH.text $ show text ]
           ]
