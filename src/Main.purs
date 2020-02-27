@@ -35,12 +35,32 @@ type MyComponent = H.ComponentHTML Unit () Aff
 --       [ HH.text "You can click me, but I don't do anything." ]
 --     ]
 
+renderNav :: H.ComponentHTML Unit () Aff
+renderNav =
+-- <ul class="nav">
+--   <li class="nav-item">
+--     <a class="nav-link active" href="#">Active</a>
+--   </li>
+--   <li class="nav-item">
+--     <a class="nav-link" href="#">Link</a>
+--   </li>
+--   <li class="nav-item">
+--     <a class="nav-link" href="#">Link</a>
+--   </li>
+--   <li class="nav-item">
+--     <a class="nav-link disabled" href="#">Disabled</a>
+--   </li>
+-- </ul>
+  HH.ul
+    [ HP.class_ $ ClassName "nav nav-tabs" ]
+    [ HH.li [ HP.class_ $ ClassName "nav-item" ] [ HH.a [ HP.class_ $ ClassName "nav-link active", HP.href "#" ] [ HH.text "Active" ] ]
+    , HH.li [ HP.class_ $ ClassName "nav-item" ] [ HH.a [ HP.class_ $ ClassName "nav-link", HP.href "#" ] [ HH.text "Link" ] ]
+    ]
+
 renderHtml :: H.ComponentHTML Unit () Aff
 renderHtml =
   HH.div_
-    [ HH.div
-      [ HP.class_ $ ClassName "orange" ]
-      [ HH.text "nav" ]
+    [ renderNav
     , render $ SendOut { message: Message { id: "dlg123", text: "hi!" }, recipients: [Recipient { id: "user1", status: None }]}
     ]
 
