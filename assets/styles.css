@@ -1,7 +1,11 @@
-.message {
+.red {
     border: 5px solid red;
 }
 
-.recipients {
+.blue {
     border: 5px solid blue;
+}
+
+.orange {
+    border: 5px solid orange;
 }

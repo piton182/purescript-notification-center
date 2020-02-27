@@ -7391,8 +7391,6 @@ var PS = {};
   var Data_Maybe = $PS["Data.Maybe"];
   var Halogen_HTML_Core = $PS["Halogen.HTML.Core"];
   var element = Halogen_HTML_Core.element(Data_Maybe.Nothing.value);
-  var span = element("span");
-  var span_ = span([  ]);
   var table = element("table");
   var table_ = table([  ]);
   var td = element("td");
@@ -7405,7 +7403,7 @@ var PS = {};
   var div_ = div([  ]);
   exports["div"] = div;
   exports["div_"] = div_;
-  exports["span_"] = span_;
+  exports["table"] = table;
   exports["table_"] = table_;
   exports["td_"] = td_;
   exports["th_"] = th_;
@@ -8062,15 +8060,15 @@ var PS = {};
       if (v instanceof Received) {
           return "Received";
       };
-      throw new Error("Failed pattern match at Main (line 53, column 1 - line 56, column 29): " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Main (line 61, column 1 - line 64, column 29): " + [ v.constructor.name ]);
   });
   var renderableRecipients = new Renderable(function (recipients) {
-      return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("recipients") ])([ Halogen_HTML_Elements.span_([ Halogen_HTML_Core.text("Recipients") ]), Halogen_HTML_Elements.table_(Data_Array.cons(Halogen_HTML_Elements.tr_([ Halogen_HTML_Elements.th_([ Halogen_HTML_Core.text("User") ]), Halogen_HTML_Elements.th_([ Halogen_HTML_Core.text("Status") ]) ]))(Data_Functor.map(Data_Functor.functorArray)(function (v) {
+      return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("blue") ])([ Halogen_HTML_Elements.table([ Halogen_HTML_Properties.class_("table") ])(Data_Array.cons(Halogen_HTML_Elements.tr_([ Halogen_HTML_Elements.th_([ Halogen_HTML_Core.text("User") ]), Halogen_HTML_Elements.th_([ Halogen_HTML_Core.text("Status") ]) ]))(Data_Functor.map(Data_Functor.functorArray)(function (v) {
           return Halogen_HTML_Elements.tr_([ Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text(Data_Show.show(Data_Show.showString)(v.id)) ]), Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text(Data_Show.show(showStatus)(v.status)) ]) ]);
       })(recipients))) ]);
   });
   var renderableMessage = new Renderable(function (v) {
-      return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("message") ])([ Halogen_HTML_Elements.table_([ Halogen_HTML_Elements.tr_([ Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text("ID:") ]), Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text(Data_Show.show(Data_Show.showString)(v.id)) ]) ]), Halogen_HTML_Elements.tr_([ Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text("Text:") ]), Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text(Data_Show.show(Data_Show.showString)(v.text)) ]) ]) ]) ]);
+      return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("red") ])([ Halogen_HTML_Elements.table_([ Halogen_HTML_Elements.tr_([ Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text("ID:") ]), Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text(Data_Show.show(Data_Show.showString)(v.id)) ]) ]), Halogen_HTML_Elements.tr_([ Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text("Text:") ]), Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text(Data_Show.show(Data_Show.showString)(v.text)) ]) ]) ]) ]);
   });
   var render = function (dict) {
       return dict.render;
@@ -8078,7 +8076,7 @@ var PS = {};
   var rendarableSendOut = new Renderable(function (v) {
       return Halogen_HTML_Elements.div_([ render(renderableMessage)(v.message), render(renderableRecipients)(v.recipients) ]);
   });
-  var renderHtml = render(rendarableSendOut)({
+  var renderHtml = Halogen_HTML_Elements.div_([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("orange") ])([ Halogen_HTML_Core.text("nav") ]), render(rendarableSendOut)({
       message: {
           id: "dlg123",
           text: "hi!"
@@ -8087,7 +8085,7 @@ var PS = {};
           id: "user1",
           status: None.value
       } ]
-  });
+  }) ]);
   var mkMyComponent = Halogen_Component.mkComponent({
       initialState: Data_Function["const"](Data_Unit.unit),
       render: function (v) {

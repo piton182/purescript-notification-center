@@ -36,7 +36,15 @@ type MyComponent = H.ComponentHTML Unit () Aff
 --     ]
 
 renderHtml :: H.ComponentHTML Unit () Aff
-renderHtml = render $ SendOut { message: Message { id: "dlg123", text: "hi!" }, recipients: [Recipient { id: "user1", status: None }]}
+renderHtml =
+  HH.div_
+    [ HH.div
+      [ HP.class_ $ ClassName "orange" ]
+      [ HH.text "nav" ]
+    , render $ SendOut { message: Message { id: "dlg123", text: "hi!" }, recipients: [Recipient { id: "user1", status: None }]}
+    ]
+
+-- renderHtml = render $ SendOut { message: Message { id: "dlg123", text: "hi!" }, recipients: [Recipient { id: "user1", status: None }]}
 
 mkMyComponent :: H.Component HH.HTML (Const Unit) Unit Void Aff
 mkMyComponent =
@@ -72,9 +80,8 @@ instance rendarableSendOut :: Renderable SendOut where
 instance renderableRecipients :: Renderable (Array Recipient) where
   render recipients =
     HH.div
-      [ HP.class_ $ ClassName "recipients" ]
-      [ HH.span_ [ HH.text "Recipients" ]
-      , HH.table_ $
+      [ HP.class_ $ ClassName "blue" ]
+      [ HH.table [ HP.class_ $ ClassName "table" ] $
           cons (HH.tr_ [ HH.th_ [ HH.text "User" ], HH.th_ [ HH.text "Status" ]]) $
             (\(Recipient r) -> HH.tr_ [ HH.td_ [ HH.text $ show r.id ], HH.td_ [ HH.text $ show r.status ] ]) <$> recipients
       ]
@@ -82,7 +89,7 @@ instance renderableRecipients :: Renderable (Array Recipient) where
 instance renderableMessage :: Renderable Message where
   render (Message { id, text }) =
     HH.div
-      [ HP.class_ $ ClassName "message" ]
+      [ HP.class_ $ ClassName "red" ]
       [ HH.table_
         [ HH.tr_
           [ HH.td_
