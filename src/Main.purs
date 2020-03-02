@@ -12,13 +12,22 @@ import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
 import Effect.Aff (Aff)
 import Data.Const (Const)
-import Data.Array (cons)
+import Data.Array (cons, head)
 import Halogen.HTML (ClassName(..))
+
+initialState :: State
+initialState =
+    { activeSendout: SendOut { message: Message { id: "dlg123", text: "hi!" }, recipients: [ Recipient { id: "user1", status: None }, Recipient { id: "user2", status: None } ]}
+    , sendouts:
+        [ SendOut { message: Message { id: "dlg123", text: "hi!" }, recipients: [ Recipient { id: "user1", status: None }, Recipient { id: "user2", status: None } ]}
+        , SendOut { message: Message { id: "dlg124", text: "bye!" }, recipients: [ Recipient { id: "user1", status: None } ] }
+        ]
+    }
 
 main :: Effect Unit
 main = launchAff_ do
   body <- awaitBody
-  runUI mkMyComponent unit body
+  runUI (mkMyComponent initialState renderHtml) unit body
 
 type MyComponent = H.ComponentHTML Unit () Aff
 
@@ -35,8 +44,17 @@ type MyComponent = H.ComponentHTML Unit () Aff
 --       [ HH.text "You can click me, but I don't do anything." ]
 --     ]
 
-renderNav :: H.ComponentHTML Unit () Aff
-renderNav =
+type State = { activeSendout :: SendOut, sendouts :: Array SendOut }
+
+-- sendouts :: Array SendOut
+-- sendouts =
+--   [ SendOut { message: Message { id: "dlg123", text: "hi!" }, recipients: [ Recipient { id: "user1", status: None }, Recipient { id: "user2", status: None } ]} ]
+
+-- sendouts2navslugs :: Array SendOut -> Array String
+-- sendouts2navslugs sendouts = (\(SendOut { message: Message { id: messageId } } ) -> messageId) <$> sendouts
+
+renderNav :: SendOut -> Array SendOut -> StaticHTML
+renderNav (SendOut { message: Message { id: activeSendoutSlug }}) sendouts =
 -- <ul class="nav">
 --   <li class="nav-item">
 --     <a class="nav-link active" href="#">Active</a>
@@ -53,28 +71,30 @@ renderNav =
 -- </ul>
   HH.ul
     [ HP.class_ $ ClassName "nav nav-tabs flex-column" ]
-    [ HH.li [ HP.class_ $ ClassName "nav-item" ] [ HH.a [ HP.class_ $ ClassName "nav-link active", HP.href "#" ] [ HH.text "Active" ] ]
-    , HH.li [ HP.class_ $ ClassName "nav-item" ] [ HH.a [ HP.class_ $ ClassName "nav-link", HP.href "#" ] [ HH.text "Link" ] ]
-    ]
+    -- [ HH.li [ HP.class_ $ ClassName "nav-item" ] [ HH.a [ HP.class_ $ ClassName "nav-link active", HP.href "#" ] [ HH.text "asdf" ] ] ]
+    ((\(SendOut { message: Message { id: slug } } ) -> HH.li [ HP.class_ $ ClassName "nav-item" ] [ HH.a [ HP.class_ $ ClassName ("nav-link" <> (if slug `eq` activeSendoutSlug then " active" else "")), HP.href "#" ] [ HH.text $ show slug ] ]) <$> sendouts)
 
-renderHtml :: H.ComponentHTML Unit () Aff
-renderHtml =
+renderHtml :: State -> StaticHTML
+renderHtml state =
   HH.div [ HP.class_ $ ClassName "container-fluid" ]
     [ HH.div [ HP.class_ $ ClassName "row" ]
-      [ HH.div [ HP.class_ $ ClassName "col"]
-        [ renderNav ]
-      , HH.div [ HP.class_ $ ClassName "col-10"]
-        [ render $ SendOut { message: Message { id: "dlg123", text: "hi!" }, recipients: [ Recipient { id: "user1", status: None }, Recipient { id: "user2", status: None } ]} ]
+      [ HH.div [ HP.class_ $ ClassName "col" ]
+        [ renderNav state.activeSendout state.sendouts ]
+      , HH.div [ HP.class_ $ ClassName "col-10" ]
+        [ render $ state.activeSendout ]
       ]
     ]
 
 -- renderHtml = render $ SendOut { message: Message { id: "dlg123", text: "hi!" }, recipients: [Recipient { id: "user1", status: None }]}
 
-mkMyComponent :: H.Component HH.HTML (Const Unit) Unit Void Aff
-mkMyComponent =
+type StaticHTML = H.ComponentHTML Unit () Aff
+type Renderer state = (state -> StaticHTML)
+
+mkMyComponent :: forall state. state -> Renderer state -> H.Component HH.HTML (Const Unit) Unit Void Aff
+mkMyComponent state renderer =
   H.mkComponent
-    { initialState: const unit
-    , render: \_ -> renderHtml
+    { initialState: const state
+    , render: renderer
     , eval: H.mkEval H.defaultEval
     }
 

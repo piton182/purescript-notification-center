@@ -8066,7 +8066,7 @@ var PS = {};
       if (v instanceof Received) {
           return "Received";
       };
-      throw new Error("Failed pattern match at Main (line 85, column 1 - line 88, column 29): " + [ v.constructor.name ]);
+      throw new Error("Failed pattern match at Main (line 105, column 1 - line 108, column 29): " + [ v.constructor.name ]);
   });
   var renderableRecipients = new Renderable(function (recipients) {
       return Halogen_HTML_Elements.div_([ Halogen_HTML_Elements.table([ Halogen_HTML_Properties.class_("table") ])(Data_Array.cons(Halogen_HTML_Elements.tr_([ Halogen_HTML_Elements.th_([ Halogen_HTML_Core.text("User") ]), Halogen_HTML_Elements.th_([ Halogen_HTML_Core.text("Status") ]) ]))(Data_Functor.map(Data_Functor.functorArray)(function (v) {
@@ -8076,37 +8076,79 @@ var PS = {};
   var renderableMessage = new Renderable(function (v) {
       return Halogen_HTML_Elements.div_([ Halogen_HTML_Elements.table([ Halogen_HTML_Properties.class_("table") ])([ Halogen_HTML_Elements.tr_([ Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text("ID") ]), Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text(Data_Show.show(Data_Show.showString)(v.id)) ]) ]), Halogen_HTML_Elements.tr_([ Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text("Text") ]), Halogen_HTML_Elements.td_([ Halogen_HTML_Core.text(Data_Show.show(Data_Show.showString)(v.text)) ]) ]) ]) ]);
   });
-  var renderNav = Halogen_HTML_Elements.ul([ Halogen_HTML_Properties.class_("nav nav-tabs flex-column") ])([ Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("nav-item") ])([ Halogen_HTML_Elements.a([ Halogen_HTML_Properties.class_("nav-link active"), Halogen_HTML_Properties.href("#") ])([ Halogen_HTML_Core.text("Active") ]) ]), Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("nav-item") ])([ Halogen_HTML_Elements.a([ Halogen_HTML_Properties.class_("nav-link"), Halogen_HTML_Properties.href("#") ])([ Halogen_HTML_Core.text("Link") ]) ]) ]);
+  var renderNav = function (v) {
+      return function (sendouts) {
+          return Halogen_HTML_Elements.ul([ Halogen_HTML_Properties.class_("nav nav-tabs flex-column") ])(Data_Functor.map(Data_Functor.functorArray)(function (v1) {
+              return Halogen_HTML_Elements.li([ Halogen_HTML_Properties.class_("nav-item") ])([ Halogen_HTML_Elements.a([ Halogen_HTML_Properties.class_("nav-link" + (function () {
+                  var $14 = v1.message.id === v.message.id;
+                  if ($14) {
+                      return " active";
+                  };
+                  return "";
+              })()), Halogen_HTML_Properties.href("#") ])([ Halogen_HTML_Core.text(Data_Show.show(Data_Show.showString)(v1.message.id)) ]) ]);
+          })(sendouts));
+      };
+  };
   var render = function (dict) {
       return dict.render;
   };
   var rendarableSendOut = new Renderable(function (v) {
       return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("container-fluid") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("row") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col") ])([ render(renderableMessage)(v.message) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col") ])([ render(renderableRecipients)(v.recipients) ]) ]) ]);
   });
-  var renderHtml = Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("container-fluid") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("row") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col") ])([ renderNav ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col-10") ])([ render(rendarableSendOut)({
-      message: {
-          id: "dlg123",
-          text: "hi!"
+  var renderHtml = function (state) {
+      return Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("container-fluid") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("row") ])([ Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col") ])([ renderNav(state.activeSendout)(state.sendouts) ]), Halogen_HTML_Elements.div([ Halogen_HTML_Properties.class_("col-10") ])([ render(rendarableSendOut)(state.activeSendout) ]) ]) ]);
+  };
+  var mkMyComponent = function (state) {
+      return function (renderer) {
+          return Halogen_Component.mkComponent({
+              initialState: Data_Function["const"](state),
+              render: renderer,
+              "eval": Halogen_Component.mkEval(Halogen_Component.defaultEval)
+          });
+      };
+  };
+  var initialState = {
+      activeSendout: {
+          message: {
+              id: "dlg123",
+              text: "hi!"
+          },
+          recipients: [ {
+              id: "user1",
+              status: None.value
+          }, {
+              id: "user2",
+              status: None.value
+          } ]
       },
-      recipients: [ {
-          id: "user1",
-          status: None.value
+      sendouts: [ {
+          message: {
+              id: "dlg123",
+              text: "hi!"
+          },
+          recipients: [ {
+              id: "user1",
+              status: None.value
+          }, {
+              id: "user2",
+              status: None.value
+          } ]
       }, {
-          id: "user2",
-          status: None.value
+          message: {
+              id: "dlg124",
+              text: "bye!"
+          },
+          recipients: [ {
+              id: "user1",
+              status: None.value
+          } ]
       } ]
-  }) ]) ]) ]);
-  var mkMyComponent = Halogen_Component.mkComponent({
-      initialState: Data_Function["const"](Data_Unit.unit),
-      render: function (v) {
-          return renderHtml;
-      },
-      "eval": Halogen_Component.mkEval(Halogen_Component.defaultEval)
-  });
+  };
   var main = Effect_Aff.launchAff_(Control_Bind.bind(Effect_Aff.bindAff)(Halogen_Aff_Util.awaitBody)(function (body) {
-      return Halogen_VDom_Driver.runUI(mkMyComponent)(Data_Unit.unit)(body);
+      return Halogen_VDom_Driver.runUI(mkMyComponent(initialState)(renderHtml))(Data_Unit.unit)(body);
   }));
   exports["render"] = render;
+  exports["initialState"] = initialState;
   exports["main"] = main;
   exports["renderNav"] = renderNav;
   exports["renderHtml"] = renderHtml;
