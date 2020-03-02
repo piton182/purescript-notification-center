@@ -53,8 +53,8 @@ type State = { activeSendout :: SendOut, sendouts :: Array SendOut }
 -- sendouts2navslugs :: Array SendOut -> Array String
 -- sendouts2navslugs sendouts = (\(SendOut { message: Message { id: messageId } } ) -> messageId) <$> sendouts
 
-renderNav :: SendOut -> Array SendOut -> StaticHTML
-renderNav (SendOut { message: Message { id: activeSendoutSlug }}) sendouts =
+renderNav :: State -> StaticHTML
+renderNav state =
 -- <ul class="nav">
 --   <li class="nav-item">
 --     <a class="nav-link active" href="#">Active</a>
@@ -71,15 +71,22 @@ renderNav (SendOut { message: Message { id: activeSendoutSlug }}) sendouts =
 -- </ul>
   HH.ul
     [ HP.class_ $ ClassName "nav nav-tabs flex-column" ]
-    -- [ HH.li [ HP.class_ $ ClassName "nav-item" ] [ HH.a [ HP.class_ $ ClassName "nav-link active", HP.href "#" ] [ HH.text "asdf" ] ] ]
-    ((\(SendOut { message: Message { id: slug } } ) -> HH.li [ HP.class_ $ ClassName "nav-item" ] [ HH.a [ HP.class_ $ ClassName ("nav-link" <> (if slug `eq` activeSendoutSlug then " active" else "")), HP.href "#" ] [ HH.text $ show slug ] ]) <$> sendouts)
+    (renderNavItem <$> state.sendouts)
+  where
+    -- isActiveSendout (SendOut { message: Message { id: activeSendoutSlug }}) (SendOut { message: Maaaessage { id: slug } }) = slug `eq` activeSendoutSlug
+    sendout2slug (SendOut { message: Message { id: slug } }) = slug
+    renderNavItem sendout =
+      HH.li [ HP.class_ $ ClassName "nav-item" ]
+        [ HH.a [ HP.class_ $ ClassName ("nav-link" <> (if sendout `eq` state.activeSendout then " active" else "")), HP.href "#" ]
+          [ HH.text $ show $ sendout2slug sendout ]
+        ]
 
 renderHtml :: State -> StaticHTML
 renderHtml state =
   HH.div [ HP.class_ $ ClassName "container-fluid" ]
     [ HH.div [ HP.class_ $ ClassName "row" ]
       [ HH.div [ HP.class_ $ ClassName "col" ]
-        [ renderNav state.activeSendout state.sendouts ]
+        [ renderNav state ]
       , HH.div [ HP.class_ $ ClassName "col-10" ]
         [ render $ state.activeSendout ]
       ]
@@ -110,6 +117,9 @@ instance showStatus :: Show Status where
 newtype Recipient = Recipient { id :: String, status :: Status }
 
 newtype SendOut = SendOut ({ message :: Message, recipients :: Array Recipient })
+
+instance eqSendOut :: Eq SendOut where
+  eq (SendOut { message: Message { id: x }}) (SendOut { message: Message { id: y }}) = eq x y
 
 class Renderable a where
   render :: a -> H.ComponentHTML Unit () Aff
