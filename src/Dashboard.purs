@@ -86,7 +86,7 @@ render state =
         [ HH.td_ [ HH.text $ show r.user ]
         , HH.td_
           [ HH.text $ showInbox inbox
-          , HH.a [ HP.href "#", HE.onClick \_ -> Just $ CheckInbox r.user ] [ HH.text "[check]" ] ]
+          , HH.a [ HP.href "#", HE.onClick \_ -> Just $ CheckInbox r.user ] [ HH.text "(check)" ] ]
         ]
       where
         showInbox :: Maybe Inbox -> String
@@ -110,19 +110,29 @@ render state =
       --   </li>
       -- </ul>
       HH.ul
-        [ HP.class_ $ ClassName "nav nav-tabs flex-column" ]
-        (renderNavItem <$> state.sendouts)
-          where
-            sendout2slug (SendOut { message: Message { id: slug } }) = slug
-            renderNavItem sendout =
-              HH.li [ HP.class_ $ ClassName "nav-item" ]
-              [ HH.a
-                [ HP.class_ $ ClassName ("nav-link" <> (if sendout `eq` state.activeSendout then " active" else ""))
-                , HP.href "#"
-                , HE.onClick \_ -> Just $ SwitchTab $ sendout
-                ]
-                [ HH.text $ show $ sendout2slug sendout ]
-              ]
+        [ HP.class_ $ ClassName "nav nav-tabs flex-column" ] $
+        (renderNavItem <$> state.sendouts) <> (
+          [ HH.li [ HP.class_ $ ClassName "nav-item" ]
+            [ HH.a
+               [ HP.class_ $ ClassName ("nav-link")
+               , HP.href "#"
+               , HE.onClick \_ -> Nothing
+               ]
+               [ HH.text "(new)" ]
+            ]
+          ]
+        )
+      where
+        sendout2slug (SendOut { message: Message { id: slug } }) = slug
+        renderNavItem sendout =
+          HH.li [ HP.class_ $ ClassName "nav-item" ]
+          [ HH.a
+            [ HP.class_ $ ClassName ("nav-link" <> (if sendout `eq` state.activeSendout then " active" else ""))
+            , HP.href "#"
+            , HE.onClick \_ -> Just $ SwitchTab $ sendout
+            ]
+            [ HH.text $ show $ sendout2slug sendout ]
+          ]
 
 handleAction :: forall o m. CheckInbox m => Action -> H.HalogenM State Action () o m Unit
 handleAction = case _ of
