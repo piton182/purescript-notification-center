@@ -14,6 +14,3 @@ class Monad m <= CheckInbox m where
 
 instance checkInboxHalogenM :: CheckInbox m => CheckInbox (HalogenM st action slots msg m) where
   checkInbox = lift <<< checkInbox
-
-instance checkInboxAff :: CheckInbox Aff where
-  checkInbox _ = pure $ Inbox $ [ message_dlg125 ]
