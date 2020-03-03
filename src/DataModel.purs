@@ -5,63 +5,41 @@ import Prelude
 import Halogen as H
 import Halogen.HTML as HH
 import Halogen.HTML.Properties as HP
+import Halogen.HTML.Events as HE
 import Halogen.HTML (ClassName(..))
-import Data.Array (cons)
+import Data.Maybe (Maybe(..))
 
 newtype SendOut = SendOut ({ message :: Message, recipients :: Array Recipient })
 
-newtype Recipient = Recipient { id :: String, status :: Status }
+newtype User = User { id :: String }
+
+newtype Recipient = Recipient { user :: User, status :: Status }
 
 newtype Message = Message { id :: String, text :: String }
+
+instance showMessage :: Show Message where
+  show (Message { id }) = show id
 
 instance eqSendOut :: Eq SendOut where
   eq (SendOut { message: Message { id: x }}) (SendOut { message: Message { id: y }}) = eq x y
 
--- TODO: doesn't belong here, but ok for now
-class Renderable a where
-  render :: forall action slots m. a -> H.ComponentHTML action slots m
-
 data Status = None | Sent | Received
 
 instance showStatus :: Show Status where
-  show None = "None"
-  show Sent = "Sent"
-  show Received = "Received"
+  show None = "NONE"
+  show Sent = "SENT"
+  show Received = "RECEIVED"
 
-instance rendarableSendOut :: Renderable SendOut where
-  render (SendOut { message, recipients }) =
-    HH.div [ HP.class_ $ ClassName "container-fluid" ]
-      [ HH.div [ HP.class_ $ ClassName "row" ]
-        [ HH.div [HP.class_ $ ClassName "col" ]
-          [ render message ]
-        , HH.div [HP.class_ $ ClassName "col" ]
-          [ render recipients ]
-        ]
-      ]
+instance showUser :: Show User where
+  show (User { id }) = id
 
-instance renderableRecipients :: Renderable (Array Recipient) where
-  render recipients =
-    HH.div_
-      [ HH.table [ HP.class_ $ ClassName "table" ] $
-          cons (HH.tr_ [ HH.th_ [ HH.text "User" ], HH.th_ [ HH.text "Status" ]]) $
-            (\(Recipient r) -> HH.tr_ [ HH.td_ [ HH.text $ show r.id ], HH.td_ [ HH.text $ show r.status ] ]) <$> recipients
-      ]
+newtype Inbox = Inbox (Array Message)
 
-instance renderableMessage :: Renderable Message where
-  render (Message { id, text }) =
-    HH.div_
-      [ HH.table [ HP.class_ $ ClassName "table" ]
-        [ HH.tr_
-          [ HH.td_
-            [ HH.text "ID" ]
-          , HH.td_
-            [ HH.text $ show id ]
-          ]
-        , HH.tr_
-          [ HH.td_
-            [ HH.text "Text" ]
-          , HH.td_
-            [ HH.text $ show text ]
-          ]
-        ]
-      ]
+instance showInbox :: Show Inbox where
+  show (Inbox msgs) = show msgs
+
+instance eqUser :: Eq User where
+  eq (User { id: x }) (User { id: y }) = eq x y
+
+instance ordUser :: Ord User where
+  compare (User { id: x }) (User { id: y }) = compare x y
