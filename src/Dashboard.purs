@@ -14,8 +14,7 @@ import DataModel (SendOut(..), Message(..), Recipient(..), Status(..))
 
 type State = { activeSendout :: SendOut, sendouts :: Array SendOut }
 
-type Slug = String
-data Action = SwitchTab Slug
+data Action = SwitchTab SendOut
 
 component :: forall q i o m. H.Component HH.HTML q i o m
 component =
@@ -23,7 +22,7 @@ component =
     { initialState
     , render
     , eval: H.mkEval $ H.defaultEval
-      -- { handleAction = handleAction }
+      { handleAction = handleAction }
     }
 
 initialState :: forall i. i -> State
@@ -46,9 +45,10 @@ render state =
       ]
     ]
 
--- handleAction :: forall o m. LogMessages m => Action -> H.HalogenM State Action () o m Unit
--- handleAction = case _ of
---   ?
+handleAction :: forall o m. Action -> H.HalogenM State Action () o m Unit
+handleAction = case _ of
+  SwitchTab sendout -> do
+    H.modify_ \st -> st { activeSendout = sendout }
 
 renderNav :: forall m. State -> H.ComponentHTML Action () m
 renderNav state =
@@ -76,7 +76,7 @@ renderNav state =
         [ HH.a
           [ HP.class_ $ ClassName ("nav-link" <> (if sendout `eq` state.activeSendout then " active" else ""))
           , HP.href "#"
-          , HE.onClick \_ -> Just $ SwitchTab $ sendout2slug sendout
+          , HE.onClick \_ -> Just $ SwitchTab $ sendout
           ]
           [ HH.text $ show $ sendout2slug sendout ]
         ]
