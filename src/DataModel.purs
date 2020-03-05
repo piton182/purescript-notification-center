@@ -17,6 +17,9 @@ newtype Recipient = Recipient { user :: User, status :: Status }
 
 newtype Message = Message { id :: String, text :: String }
 
+mkMessage :: String -> Message
+mkMessage msg = Message { id: "asdf", text: msg}
+
 instance showMessage :: Show Message where
   show (Message { id }) = show id
 
@@ -33,10 +36,7 @@ instance showStatus :: Show Status where
 instance showUser :: Show User where
   show (User { id }) = id
 
-newtype Inbox = Inbox (Array Message)
-
-instance showInbox :: Show Inbox where
-  show (Inbox msgs) = show msgs
+type Inbox = Array Message
 
 instance eqUser :: Eq User where
   eq (User { id: x }) (User { id: y }) = eq x y

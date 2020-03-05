@@ -1,0 +1,38 @@
+module AppM where
+
+import Prelude
+
+import Effect.Aff (Aff)
+import Capabilities.CheckInbox (class CheckInbox)
+import DataModel
+import TestData (message_dlg125)
+import Data.Maybe
+import Data.Map (Map, lookup, empty)
+import Control.Monad.State.Trans (StateT(..), gets, get, put, runStateT)
+import Control.Monad.State.Class (class MonadState)
+import Type.Equality (class TypeEquals, from)
+
+type Storage = Map User Inbox
+
+newtype AppM a = AppM (StateT Storage Aff a)
+
+runAppM :: AppM Unit -> Aff Unit
+runAppM (AppM m) = do
+  _ <- runStateT m empty
+  pure unit
+
+derive newtype instance functorAppM :: Functor AppM
+derive newtype instance applyAppM :: Apply AppM
+derive newtype instance applicativeAppM :: Applicative AppM
+derive newtype instance bindAppM :: Bind AppM
+derive newtype instance monadAppM :: Monad AppM
+-- derive newtype instance monadEffectAppM :: MonadEffect AppM
+-- derive newtype instance monadAffAppM :: MonadAff AppM
+
+instance monadStateAppM :: TypeEquals s Storage => MonadState s AppM where
+  state f = AppM $ StateT $ pure <<< f
+
+instance checkInboxAppM :: CheckInbox AppM where
+  checkInbox user = do
+    storage <- get
+    pure $ lookup user storage

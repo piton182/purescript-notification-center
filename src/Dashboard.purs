@@ -11,8 +11,9 @@ import Data.Maybe (Maybe(..))
 import Data.Map (Map, insert, empty, lookup)
 
 import DataModel (User(..), Inbox, SendOut(..), Message(..), Recipient(..), Status(..))
-import Capabilities.CheckInbox (class CheckInbox, checkInbox)
 import TestData
+import DSL (DSL, checkInbox)
+import Control.Monad.Trans.Class (lift)
 
 type State =
   { activeSendout :: SendOut
@@ -21,7 +22,7 @@ type State =
 
 data Action = SwitchTab SendOut | CheckInbox User
 
-component :: forall q i o m. CheckInbox m => H.Component HH.HTML q i o m
+component :: forall q i o. H.Component HH.HTML q i o DSL
 component =
   H.mkComponent
     { initialState
@@ -134,10 +135,10 @@ render state =
             [ HH.text $ show $ sendout2slug sendout ]
           ]
 
-handleAction :: forall o m. CheckInbox m => Action -> H.HalogenM State Action () o m Unit
+handleAction :: forall o. Action -> H.HalogenM State Action () o DSL Unit
 handleAction = case _ of
   SwitchTab sendout -> do
     H.modify_ \st -> st { activeSendout = sendout }
   CheckInbox user -> do
-    inbox <- checkInbox user
+    inbox <- lift $ checkInbox
     H.modify_ \st -> st { inboxes = insert user inbox st.inboxes }
