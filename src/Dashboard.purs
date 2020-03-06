@@ -1,19 +1,19 @@
 module Dashboard where
 
 import Prelude
-
-import Halogen as H
-import Halogen.HTML as HH
-import Halogen.HTML.Properties as HP
-import Halogen.HTML (ClassName(..))
-import Halogen.HTML.Events as HE
-import Data.Maybe (Maybe(..))
-import Data.Map (Map, insert, empty, lookup)
-
-import DataModel (User(..), Inbox, SendOut(..), Message(..), Recipient(..), Status(..))
 import TestData
-import DSL (DSL, checkInbox)
+
+import Capabilities.CheckInbox (class CheckInbox, checkInbox)
 import Control.Monad.Trans.Class (lift)
+import Data.Map (Map, insert, empty, lookup)
+import Data.Maybe (Maybe(..))
+import DataModel (User(..), Inbox, SendOut(..), Message(..), Recipient(..), Status(..))
+import Halogen as H
+import Halogen.HTML (ClassName(..))
+import Halogen.HTML as HH
+import Halogen.HTML.Events as HE
+import Halogen.HTML.Properties as HP
+import Web.HTML.Event.EventTypes (offline)
 
 type State =
   { activeSendout :: SendOut
@@ -22,7 +22,7 @@ type State =
 
 data Action = SwitchTab SendOut | CheckInbox User
 
-component :: forall q i o. H.Component HH.HTML q i o DSL
+component :: forall q i o m. CheckInbox m => H.Component HH.HTML q i o m
 component =
   H.mkComponent
     { initialState
@@ -135,10 +135,13 @@ render state =
             [ HH.text $ show $ sendout2slug sendout ]
           ]
 
-handleAction :: forall o. Action -> H.HalogenM State Action () o DSL Unit
+handleAction :: forall o m. CheckInbox m => Action -> H.HalogenM State Action () o m Unit
 handleAction = case _ of
   SwitchTab sendout -> do
     H.modify_ \st -> st { activeSendout = sendout }
   CheckInbox user -> do
-    inbox <- lift $ checkInbox
-    H.modify_ \st -> st { inboxes = insert user inbox st.inboxes }
+    inbox <- lift $ checkInbox user
+    case inbox of
+      Nothing -> pure unit
+      Just inbox' ->
+        H.modify_ \st -> st { inboxes = insert user inbox' st.inboxes } 
