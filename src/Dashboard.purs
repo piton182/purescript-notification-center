@@ -14,15 +14,18 @@ import Halogen.HTML as HH
 import Halogen.HTML.Events as HE
 import Halogen.HTML.Properties as HP
 import Web.HTML.Event.EventTypes (offline)
+import Data.Array (cons)
+import Capabilities.GenerateData (class GenerateData, generateSendout)
+import Data.Either
 
 type State =
   { activeSendout :: SendOut
   , sendouts :: Array SendOut
   , inboxes :: Map User Inbox }
 
-data Action = SwitchTab SendOut | CheckInbox User
+data Action = SwitchTab SendOut | CheckInbox User | NewSendout
 
-component :: forall q i o m. CheckInbox m => H.Component HH.HTML q i o m
+component :: forall q i o m. GenerateData m => CheckInbox m => H.Component HH.HTML q i o m
 component =
   H.mkComponent
     { initialState
@@ -117,7 +120,7 @@ render state =
             [ HH.a
                [ HP.class_ $ ClassName ("nav-link")
                , HP.href "#"
-               , HE.onClick \_ -> Nothing
+               , HE.onClick \_ -> Just NewSendout
                ]
                [ HH.text "(new)" ]
             ]
@@ -135,7 +138,11 @@ render state =
             [ HH.text $ show $ sendout2slug sendout ]
           ]
 
-handleAction :: forall o m. CheckInbox m => Action -> H.HalogenM State Action () o m Unit
+handleAction :: forall o m.
+  CheckInbox m
+  => GenerateData m
+  => Action
+  -> H.HalogenM State Action () o m Unit
 handleAction = case _ of
   SwitchTab sendout -> do
     H.modify_ \st -> st { activeSendout = sendout }
@@ -144,4 +151,10 @@ handleAction = case _ of
     case inbox of
       Nothing -> pure unit
       Just inbox' ->
-        H.modify_ \st -> st { inboxes = insert user inbox' st.inboxes } 
+        H.modify_ \st -> st { inboxes = insert user inbox' st.inboxes }
+  NewSendout -> do
+    newSendout' <- generateSendout
+    case newSendout' of
+      Left _ -> pure unit
+      Right newSendout ->
+        H.modify_ \st -> st { sendouts = cons newSendout st.sendouts, activeSendout = newSendout }
